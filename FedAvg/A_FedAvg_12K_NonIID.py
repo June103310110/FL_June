@@ -6,12 +6,34 @@
 #     - MNIST/ CIFAR10
 #     - stock?
 #     
-# <img src="slide_image/FedAvg_MNIST.png" width=640  />
+# <!-- <img src="slide_image/FedAvg_MNIST.png" width=640  /> -->
 # 
+
+# In[46]:
+
+
+# %%writefile test.py 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--rounds", help="aggregation rounds",
+                    type=int)
+args = parser.parse_args()
+
+rounds_ = args.rounds
+if not rounds_:
+    raise ValueError('***Plz type in aggregation rounds***')
+# print(rounds)
+
+
+# In[45]:
+
+
+# !python test.py --rounds 100
+
 
 # ## Importing
 
-# In[2]:
+# In[1]:
 
 
 import tensorflow as tf
@@ -20,44 +42,23 @@ for gpu in gpus:
     tf.config.experimental.set_memory_growth(device=gpu, enable=True)
 
 
-# In[3]:
-
-
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, LSTM, SimpleRNN, RNN
-import numpy as np
-
-
-# ## Custom func.
-
-# In[4]:
-
-
-def simplernn(name):
-    import tensorflow as tf
-    from tensorflow.python.keras.models import Sequential, Model
-    from tensorflow.python.keras.layers import Input, Dense, Dropout, LSTM, SimpleRNN, RNN
-
-    inputs = Input(shape=(28,28), name='input')
-    y = SimpleRNN(units=128, activation='tanh', return_sequences=True, name='r1')(inputs)
-    y = Dropout(rate=0.2, name='dr1')(y)
-    y = SimpleRNN(units=128, activation='relu', return_sequences=False, name='r2')(y)
-    y = Dropout(rate=0.1, name='dr2')(y)
-    y = Dense(units=32, activation='relu', name='d1')(y)
-#     y = Dropout(rate=0.2, name='dr3')(y)
-    y = Dense(units=10, activation='softmax', name='d2')(y)
-    
-    model = Model(inputs=inputs, outputs=y, name=name)
-    return model
-
-
-# In[5]:
+# In[2]:
 
 
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import (Input, Dense, Dropout, Activation,
                                      BatchNormalization, Flatten,
                                      Conv2D, MaxPooling2D)
+import numpy as np
+import time
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+
+# ## Custom func.
+
+# In[3]:
+
 
 def simplecnn(name):
     # 選擇 Keras 的 API 寫法
@@ -87,7 +88,7 @@ def simplecnn(name):
     return cnn_model
 
 
-# In[6]:
+# In[4]:
 
 
 def model_trainable(model, under):
@@ -100,51 +101,24 @@ def model_trainable(model, under):
         print(i.trainable)
 
 
-# In[7]:
-
-
-def acc_model(X_test, y_test, model, num):
-    from sklearn.metrics import accuracy_score
-    import numpy as np
-    
-    a = np.random.choice(len(X_test), num)
-    
-    y_pred = model.predict(X_test[a])
-    y_pred = np.argmax(y_pred,axis=1)
-    y_true = y_test[a]
-#     print(accuracy_score(y_true, y_pred))
-    return accuracy_score(y_true, y_pred)
-
-
 # ## Training
 
 # ### data gathering
 
-# In[8]:
+# In[5]:
 
 
 mnist = tf.keras.datasets.mnist
-(X_train, y_train), (X_test, y_test) = mnist.load_data()
+(X_train, y_train), (X_test_origin, y_test_origin) = mnist.load_data()
 
 # 標準化數據
 X_train = X_train/255.0
-X_test = X_test/255.0
+X_test_origin = X_test_origin/255.0
 print(X_train.shape)
 print(X_train[0].shape)
 
 
-# In[9]:
-
-
-import matplotlib.pyplot as plt
-print(np.bincount(y_train))
-
-plt.bar(x = np.unique(y_train), height = np.bincount(y_train),
-       tick_label = np.unique(y_train))
-plt.xlabel('MNIST classes amount')
-
-
-# In[10]:
+# In[6]:
 
 
 idx = np.argsort(y_train)
@@ -152,9 +126,17 @@ x_train_sorted = X_train[idx]
 y_train_sorted = y_train[idx]
 
 
-# ### subset 1
+# ### Initial Model 
 
-# In[11]:
+# In[7]:
+
+
+model = simplecnn('server_model')
+
+
+# ### Initial Client 
+
+# In[8]:
 
 
 def view_clientDict(subset):
@@ -184,7 +166,7 @@ def view_clientDict(subset):
     plt.show()
 
 
-# In[12]:
+# In[9]:
 
 
 def byClasses_inbal_split(data, label, K):
@@ -194,17 +176,13 @@ def byClasses_inbal_split(data, label, K):
         
     repeat = K//len(np.unique(label))
     left = K%len(np.unique(label))
-#     print(repeat,left)
     
     subset = dict()
     unique = np.unique(label)
 
     choice = np.random.choice(unique, size = left)
-#     print(choice)
-#     print(np.bincount(choice))
     lis = []
     for i in range(len(unique)):
-#         print(i)
         cond = np.where(label==i)
         if np.isin(i, choice):
 
@@ -212,22 +190,22 @@ def byClasses_inbal_split(data, label, K):
                 lis.append([data[_], label[_]])
         else:
             for _ in np.array_split(cond[0], repeat):  # 不等分割
-#                 print(np.shape(_))
                 lis.append([data[_], label[_]])
-#     print(np.shape(lis))
     for _ in lis:
-#             print(_[1], len(_[1]))
         a = str(len(subset))
         subset['client'+a] = _
     return subset
-K = 10
+
+
+# In[10]:
+
+
+K = 12
 subset = byClasses_inbal_split(x_train_sorted, y_train_sorted, K)
 view_clientDict(subset)
 
 
-# ### subset 2
-
-# In[14]:
+# In[11]:
 
 
 def bySample_bal_split(data, label, K):
@@ -243,26 +221,16 @@ def bySample_bal_split(data, label, K):
     a = K-1
     subset['client'+str(a)] = [data[lis[a]:], label[lis[a]:]]
     return subset
-K = 10
+K = 12
 subset = bySample_bal_split(x_train_sorted, y_train_sorted, K)
 view_clientDict(subset)
 
 
-# In[13]:
+# ### Define clinet 
+
+# In[12]:
 
 
-
-# hyper_para = dict()
-# hyper_para['K'] = 6
-
-# subset= bySample_bal_split(x_train_sorted, y_train_sorted, hyper_para['K'])
-# view_clientDict(subset)
-
-
-# In[14]:
-
-
-# import tensorflow as tf
 class clint_k():
     
     def __init__(self, name):
@@ -281,46 +249,57 @@ class clint_k():
     def show_content(self):
 
         return self.attri
-#     def model_update(self, model, display=True):
-#         self.model = model
-#         if display:
-#             print('updating model for ' + self.name) 
-        
 
 
-# a = clint_k('client0')  #建立一個名叫dog的Animal實體(物件)
-# print(a.name)
-# # a.set_content([1], [1], [2])
-# a.show_content()
+# ### stuff data, model into client
 
+# In[13]:
+
+
+hyper_para = dict()
+hyper_para['K'] = 12
+
+split_method = {}
+# split_method['method'] = lambda x,y,k : byClasses_inbal_split(x,y,k)
+split_method['method'] = byClasses_inbal_split
+
+
+subset= split_method['method'](x_train_sorted, y_train_sorted, hyper_para['K'])
+view_clientDict(subset)
+
+
+# In[14]:
+
+
+from tensorflow.keras.models import clone_model
+
+
+Gmodel = simplecnn('server_model')
+
+client_list = dict() 
+
+for _ in list(subset.keys()):
+
+    client_list[_] = clint_k(_)
+    client_list[_].set_content(data = subset[_][0], # setting data and weight
+                               label = subset[_][1], model = clone_model(Gmodel))
+    client_list[_].model.set_weights(Gmodel.get_weights())
+print(client_list.keys())
+
+
+# ### aggregation func.
 
 # In[15]:
-
-
-def choice_client(hyper_para, choice, client_list):
-    
-    
-    batch_size = hyper_para['B']
-    epochs = hyper_para['E']
-    
-    for _ in choice:
-        print('Training on client'+str(_))
-        client = client_list['client'+str(_)]
-
-        model = client.model
-
-
-# In[16]:
 
 
 from tensorflow.keras.models import clone_model
 
 def avg_weight(choice, Gmodel, client_list):
-    tmp_model = clone_model(Gmodel)
-    tmp_model.set_weights(Gmodel.get_weights())
+    tmp_model = clone_model(Gmodel) # Gmdoel  
+    tmp_model.set_weights(Gmodel.get_weights()) # Gmdoel servermodel
     models = []
     weighting = []
-    for _ in choice:
+    for _ in choice: # idx of selected client
         models.append(client_list['client'+str(_)].model)
         weighting.append(len(client_list['client'+str(_)].data))
         
@@ -346,8 +325,7 @@ def avg_weight(choice, Gmodel, client_list):
     return tmp_model
 
 
-
-# In[17]:
+# In[16]:
 
 
 def model_check(model_1, model_2):
@@ -360,47 +338,12 @@ def model_check(model_1, model_2):
         else:
 #             print('Model not equal')
             print('layer %d is not equal'%i)
+    
 
 
-# In[18]:
+# ### start training
 
-
-hyper_para = dict()
-hyper_para['K'] = 12
-
-subset= bySample_bal_split(x_train_sorted, y_train_sorted, hyper_para['K'])
-view_clientDict(subset)
-
-
-# In[19]:
-
-
-from tensorflow.keras.models import clone_model
-
-
-Gmodel = simplecnn('server_model')
-
-
-        
-acc_model(X_test, y_test, Gmodel, 3000)
-
-client_list = dict()
-
-for _ in list(subset.keys()):
-
-    client_list[_] = clint_k(_)
-    client_list[_].set_content(data = subset[_][0], 
-                               label = subset[_][1], model = clone_model(Gmodel))
-    client_list[_].model.set_weights(Gmodel.get_weights())
-print(client_list.keys())
-client_list['client0'].show_content().keys()
-
-# [i.trainable for i in Gmodel.layers]
-
-
-# ## Setting para 
-
-# In[20]:
+# In[17]:
 
 
 import numpy as np
@@ -411,30 +354,33 @@ hyper_para['B'] = 1024
 # C = 1
 hyper_para['C'] = 0.5
 
-# int(np.ceil(C*hyper_para['K']))
-
 # Epochs
-hyper_para['E'] = 10
+hyper_para['E'] = 3
 
 print(hyper_para)
 
 
-# In[21]:
+# In[18]:
 
 
-for i in range(len(client_list)):
-    client = client_list['client'+str(i)]
-    model = client.model
-    print(acc_model(X_test, y_test, model, 1000))
+from sklearn.metrics import accuracy_score
+import numpy as np
+    
+def acc_model(X_test, y_test, model, num):
+
+    
+    a = np.random.choice(len(X_test), num)
+#     print(a)
+    y_pred = model.predict(X_test[a])
+    y_pred = np.argmax(y_pred,axis=1)
+    print(y_pred[0:10])
+    y_true = y_test[a]
+    print(y_true[0:10])
+#     print(accuracy_score(y_true, y_pred))
+    return accuracy_score(y_true, y_pred)
 
 
-# In[22]:
-
-
-print(hyper_para)
-
-
-# In[23]:
+# In[20]:
 
 
 import numpy as np
@@ -444,37 +390,23 @@ import tensorflow as tf
 import time
 
 acc_test = []
-acc_test.append(acc_model(X_test, y_test, Gmodel, 10000))
-
-for rounds in range(500):
+for rounds in range(rounds_):
+    print(rounds)
     clients = range(hyper_para['K'])
     
     size = int(np.ceil(hyper_para['C']*hyper_para['K']))
-
     choice = np.random.choice(clients, size = size, replace=False)
-    
-#     # Instantiate an optimizer to train the model.
-#     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-3)
-#     # Instantiate a loss function.
-#     loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
-#     # Prepare the metrics.
-#     train_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
-#     val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
 
 
     #--------------------
     batch_size = hyper_para['B']
     epochs = hyper_para['E']
-    
-    print('----------------------\nGmodel acc')
-    print(acc_model(X_test, y_test, Gmodel, 1000))
-    
+        
+
     for _ in choice:
         print('*************************************')
         print('Training on client'+str(_))
         client = client_list['client'+str(_)]
-
 
 
         model = client.model
@@ -486,30 +418,21 @@ for rounds in range(500):
 
         # Prepare the metrics.
         train_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
-        val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
-    
-    
+#         val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
+        
 
         X_train_, X_test_, y_train_, y_test_ = train_test_split(
-                client.data, client.label, test_size=0.2, random_state=42)
+                client.data, client.label, test_size=0.1)
 
-    #     (X_train_, y_train_), (X_test_, y_test_) = mnist.load_data()
 
         # Prepare the training dataset.
         train_dataset = tf.data.Dataset.from_tensor_slices((X_train_, y_train_))
         train_dataset = train_dataset.shuffle(buffer_size=1024).batch(batch_size)
 
-        # Prepare the validation dataset.
-        val_dataset = tf.data.Dataset.from_tensor_slices((X_test_, y_test_))
-        val_dataset = val_dataset.batch(batch_size//10)
-
-
         #------------------------------------------
         start_time = time.time()
         for epoch in range(epochs):
-            
-#             print("\nStart of epoch %d" % (epoch,))
-
+#             print('epoch = ',epoch)
             # Iterate over the batches of the dataset.
             for step, (x_batch_train, y_batch_train) in enumerate(train_dataset):
 
@@ -533,39 +456,47 @@ for rounds in range(500):
                 # Run one step of gradient descent by updating
                 # the value of the variables to minimize the loss.
                 optimizer.apply_gradients(zip(grads, model.trainable_weights))
-        print("Time taken: %.2fs" % (time.time() - start_time))
-                # Log every 200 batches.
-#                 if step % 10 == 0:
-#                     print(
-#                         "Training loss (for one batch) at step %d: %.4f"
-#                         % (step, float(loss_value))
-#                     )
-#                     print("Seen so far: %s samples" % ((step + 1) * batch_size))
-#             print(acc_model(X_test_, y_test_, model, 1000))
+                
+#                 # Update training metric.
+#                 train_acc_metric.update_state(y_batch_train, logits)
+                
+#             # Display metrics at the end of each epoch.
+#             train_acc = train_acc_metric.result()
+#             print("Training acc over epoch: %.4f" % (float(train_acc),))
 
+#             # Reset training metrics at the end of each epoch
+#             train_acc_metric.reset_states()
+            
+
+        print("Time taken: %.2fs" % (time.time() - start_time))
         #----------------------------------
         
-        
+    
     Gmodel = avg_weight(choice, Gmodel, client_list)
     for i in client_list:
         client_list[i].model.set_weights(Gmodel.get_weights()) 
 
+        
+        
+    # Prepare the global validation dataset. 
+    val_dataset = tf.data.Dataset.from_tensor_slices((X_test_origin, y_test_origin))
+    val_dataset = val_dataset.batch(batch_size//10)
     
-    print('----------------------\nGmodel acc')
-    print(acc_model(X_test, y_test, Gmodel, 1000))
-    acc_test.append(acc_model(X_test, y_test, Gmodel, 10000))
+    val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
+#     if rounds % 5 == 0:
+        
+    for x_batch_val, y_batch_val in val_dataset:
+            val_logits = Gmodel(x_batch_val, training=False)
+            # Update val metrics
+            val_acc_metric.update_state(y_batch_val, val_logits)
+    val_acc = val_acc_metric.result()
+    val_acc_metric.reset_states()
+    print("Global model Validation acc on global valdation set: %.4f" % (float(val_acc),))
+
+    acc_test.append(float(val_acc))
 
 
-# In[ ]:
-
-
-for i in range(len(client_list)):
-    client = client_list['client'+str(i)]
-    model = client.model
-    print(acc_model(X_test, y_test, Gmodel, 1000))
-
-
-# In[ ]:
+# In[31]:
 
 
 import pandas as pd
@@ -575,52 +506,9 @@ df = pd.DataFrame(acc_test, columns=['Gmodel acc'])
 
 df['hyper_keys'] = pd.DataFrame(hyper_para.keys())
 df['hyper_item'] = pd.DataFrame(hyper_para.values())
+df['split_method'] = pd.DataFrame([str(split_method['method']).split(' ')[1]])
+
 df.to_csv('./data/acc_test_'+timestr+'.csv', index=False)
-
-
-# In[1]:
-
-
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import os
-
-def moving_average(x, w):
-    return np.convolve(x, np.ones(w), 'valid') / w
-
-
-directory = './data'
-def plt_acctest(path = max([os.path.join(directory,d) for d in os.listdir(directory)], key=os.path.getmtime) ):
-    plt.figure(figsize=(36,8))
-    df = pd.read_csv(path)
-    print(df.loc[:3, ['hyper_keys', 'hyper_item']])
-    plt.plot(list(df.index), df['Gmodel acc'])
-    ax = [0, list(df.index)[-1]]
-    a = np.max(df['Gmodel acc'].values)
-    ay = [a,a]
-    plt.plot(ax, ay)
-    plt.text( 0, a-0.1, 'max = '+str(a), horizontalalignment='center',
-          verticalalignment='center', fontsize = 24)
-        
-    w = 10
-    mavg = moving_average(df['Gmodel acc'], w)
-#     return np.convolve(x, np.ones(w), 'valid') / w
-    plt.plot(list(df.index)[:-(w-1)], mavg)
-    
-    a = np.ceil(0.6*len(df))
-    plt.text( a,0.1, 'round = '+str(len(df)-1), horizontalalignment='center',
-          verticalalignment='center', fontsize = 30)
-    plt.xticks(list(df.index))
-    plt.show()
-    
-plt_acctest()
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

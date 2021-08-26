@@ -1,0 +1,1 @@
+jupyter nbconvert --to script my_julia_notebook.ipynb
