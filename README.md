@@ -12,7 +12,10 @@
 <p align="center">
   <img src="https://user-images.githubusercontent.com/32012425/135801492-bf5391e4-6236-4f2a-a28d-c772c3e9825d.png" />
 </p>
+
 > source Google-AI-Blog: Your phone personalizes the model locally, based on your usage (A). Many users’ updates are aggregated (B) to form a consensus change © to the shared model, after which the procedure is repeated.
+
+
 > Coffee. The finest organic suspension ever devised... I beat the Borg with it.
 
 
