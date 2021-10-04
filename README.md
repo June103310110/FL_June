@@ -29,8 +29,8 @@
 在大部分的情況下，基本上是安全的，尤其是在加入防範機制，例如加入一些雜訊或差分隱私方法(Differential privacy)進行訓練(DP-SGD)或者乾脆進行同態加密後，更是難以反向攻擊。
 當然也有研究者在討論關於惡意參與者也參與聯邦學習的話，會造成什麼影響並提出防範方法。可以參考以下論文：
 
-[1] [Deep Leakage from Gradients , MIT Song Han et.al , 2019](https://arxiv.org/abs/1906.08935)
-[2] [How To Backdoor Federated Learning, Cornell University Eugene Bagdasaryan et.al ,2018](https://arxiv.org/pdf/1807.00459.pdf)
+- [1] [Deep Leakage from Gradients , MIT Song Han et.al , 2019](https://arxiv.org/abs/1906.08935)
+- [2] [How To Backdoor Federated Learning, Cornell University Eugene Bagdasaryan et.al ,2018](https://arxiv.org/pdf/1807.00459.pdf)
 
 ## 不同使用者的資料大不相同，為什麼能訓練起來?
 首先要先理解資料大不相同在這裡的意義，精確得來說，這是關於不同的裝置中的資料(或稱Data silos)之間Non-IID的問題：
