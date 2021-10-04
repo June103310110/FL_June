@@ -66,6 +66,6 @@ Non-IID的意思是非獨立同分布，在聯邦學習的條件下主要是非�
 
 
 ### ref: 
-[1] [Deep Leakage from Gradients , MIT Song Han et.al , 2019](https://arxiv.org/abs/1906.08935)
-[2] [How To Backdoor Federated Learning, Cornell University Eugene Bagdasaryan et.al ,2018](https://arxiv.org/pdf/1807.00459.pdf)
-[3] [Communication-Efficient Learning of Deep Networks from Decentralized Data, HB McMahan et.al, 2016](https://arxiv.org/abs/1602.05629)
+- [1] [Deep Leakage from Gradients , MIT Song Han et.al , 2019](https://arxiv.org/abs/1906.08935)
+- [2] [How To Backdoor Federated Learning, Cornell University Eugene Bagdasaryan et.al ,2018](https://arxiv.org/pdf/1807.00459.pdf)
+- [3] [Communication-Efficient Learning of Deep Networks from Decentralized Data, HB McMahan et.al, 2016](https://arxiv.org/abs/1602.05629)
