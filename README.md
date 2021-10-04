@@ -9,8 +9,12 @@
 
 ```Federated Learning; Non-IID data; Model aggregation; Communication cost; Security and issues; Homomorphic encryption; Data silo; FedAvg;```
 
-![image](https://user-images.githubusercontent.com/32012425/135801492-bf5391e4-6236-4f2a-a28d-c772c3e9825d.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/32012425/135801492-bf5391e4-6236-4f2a-a28d-c772c3e9825d.png" />
+</p>
 > source: Google-AI-Blog: Your phone personalizes the model locally, based on your usage (A). Many users’ updates are aggregated (B) to form a consensus change © to the shared model, after which the procedure is repeated.
+<!-- ![image](https://user-images.githubusercontent.com/32012425/135801492-bf5391e4-6236-4f2a-a28d-c772c3e9825d.png) -->
+
 
 ## 聯邦學習的問題設定
 聯邦學習(Federated Learning)的原始發想情境(源自Google)是手機上的模型訓練。但歐盟有隱私協定(GDPR)，其他國家也對行動裝置上的資料收集有規範，因此廠商不能橫刀奪取用戶資料來訓練模型。儘管有政策限制，但大型企業因為資料隱私而被告上法院的案例仍時有所聞(FB被美國告、Google加州訴訟)。
