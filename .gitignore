@@ -1,4 +1,5 @@
 .ipynb_checkpoints
-.*.pbz2
+*.pbz2
 federated_aia_test
 __pycache__
+model-logs
