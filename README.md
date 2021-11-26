@@ -1,6 +1,8 @@
 # FederatedLearning_JuneToolbox
 聯邦學習工具包
-
+## branch 介紹
+- main: 介紹跟演算法實現
+- teaching_sample: 一個簡單的基於git的聯邦學習系統框架，可以用它來嘗試運作聯邦學習並訓練自己的模型。
 
 ## Tensorflow聯邦學習入門簡介
 
