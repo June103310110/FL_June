@@ -3,3 +3,5 @@
 federated_aia_test
 __pycache__
 model-logs
+saved_model
+*.swp
