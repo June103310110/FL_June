@@ -70,6 +70,7 @@ if '.gitignore' not in os.listdir():
         f.writelines('model-logs\n')
         f.writelines('__pycache__\n')
         f.writelines('.ipynb_checkpoints\n')
+        f.writelines('local.cfg\n')
         for i in os.listdir('../tmp'):
             print(i)
             f.writelines(i+'\n')
