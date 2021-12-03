@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[1]:
 
 
 gitURL = 'https://gitlab.aiacademy.tw/junew/federated_aia_test.git'
 account = 'at102091:12345678'
 
 
-# In[4]:
+# In[2]:
 
 
 import os
@@ -21,7 +21,7 @@ else:
     print(os.getcwd())
 
 
-# In[5]:
+# In[3]:
 
 
 from tensorflow.keras.models import Sequential, Model
@@ -34,19 +34,42 @@ import numpy as np
 from federated_aia_test.utils import compressed_cpickle, decompress_cpickle
 
 
+# In[4]:
+
+
+from IPython import get_ipython
+import os
+import argparse
+
+print(get_ipython().__class__.__name__)
+if get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
+    pass
+else:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--new_model", help="if initialize a new model or not, [default]:False",
+                       default = False, required=False)
+    args = parser.parse_args()
+    print(vars(args))
+
+
 # ### control_key (optional)
 
-# In[6]:
+# In[5]:
 
 
 contro_key = {}
-contro_key['new_model'] = False # default to False
+if 'args' in locals():
+    for i in vars(args).keys():
+        contro_key[i] = vars(args)[i]
+else:
+    contro_key['new_model'] = False
+    pass
 
 
 # ## 移動到federated_aia_test floder
 # 如果不存在，請先執行最上面的git clone
 
-# In[7]:
+# In[6]:
 
 
 print(os.getcwd())
@@ -60,6 +83,12 @@ print(os.getcwd())
 
 # ## 建立新的初始化global model 
 # > 只有當模型不存在、或者你更新了架構、打算重新訓練的時候
+
+# In[7]:
+
+
+print(contro_key['new_model'])
+
 
 # In[8]:
 
@@ -161,7 +190,7 @@ participate_branch = random.sample(all_client_branch, int(C*len(all_client_branc
 print(participate_branch)
 
 
-# In[18]:
+# In[12]:
 
 
 with open('./training.cfg', mode='r', encoding='UTF-8') as f:
@@ -174,7 +203,7 @@ with open('./training.cfg', mode='r', encoding='UTF-8') as f:
 item_dict
 
 
-# In[20]:
+# In[13]:
 
 
 rounds = int(item_dict['round'])+1
@@ -182,7 +211,7 @@ print(rounds)
 print(participate_branch)
 
 
-# In[21]:
+# In[14]:
 
 
 with open('./training.cfg', mode='w+', encoding='UTF-8') as f:
@@ -192,7 +221,7 @@ with open('./training.cfg', mode='w+', encoding='UTF-8') as f:
 
 # ## 下載各個branch中的模型壓縮檔
 
-# In[13]:
+# In[15]:
 
 
 r = os.popen('git pull').read()
@@ -211,7 +240,7 @@ if len(all_client_branch) <= 0:
     raise ValueError('June: No clients appear')
 
 
-# In[14]:
+# In[16]:
 
 
 run_cmd = lambda cmd_lis:[os.popen(i).read() for i in cmd_lis.split('\n')]
@@ -231,7 +260,7 @@ for i in all_client_branch:
 
 # ## 聚合並更新global model
 
-# In[16]:
+# In[17]:
 
 
 model_attri = decompress_cpickle('./global_model.pbz2')
@@ -242,7 +271,7 @@ lis.remove('global_model.pbz2')
 print(lis)
 
 
-# In[17]:
+# In[18]:
 
 
 weights = []
@@ -252,7 +281,7 @@ for i in lis:
 print(np.shape(weights))
 
 
-# In[18]:
+# In[19]:
 
 
 new_weights = list()
@@ -269,7 +298,7 @@ else:
 global_model.set_weights(model_attri['weights'])
 
 
-# In[19]:
+# In[20]:
 
 
 model_attri = {'weights':global_model.get_weights(), 'json':global_model.to_json()}
@@ -277,7 +306,7 @@ model_attri = {'weights':global_model.get_weights(), 'json':global_model.to_json
 compressed_cpickle('./global_model', model_attri)
 
 
-# In[23]:
+# In[21]:
 
 
 import os
@@ -300,7 +329,7 @@ branch = os.popen('git branch -a').read()
 print(branch)
 
 
-# In[3]:
+# In[22]:
 
 
 from IPython import get_ipython
