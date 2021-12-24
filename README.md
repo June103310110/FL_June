@@ -4,6 +4,9 @@
 - main: 介紹跟演算法實現
 - teaching_sample: 一個簡單的基於git的聯邦學習系統框架，可以用它來嘗試運作聯邦學習並訓練自己的模型。
 
+## Colab code
+- Git based local client toy example 
+  - [AIA_FL_toysample01.ipynb](https://colab.research.google.com/drive/10GUSXxDzE68AwbYLPDUyDPnAmasQydTG?usp=sharing)
 
 ---
 
