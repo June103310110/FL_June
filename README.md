@@ -1,6 +1,9 @@
 # FL system teaching_sample
 聯邦學習工具包
 
+## Colab code
+- [AIA_FL_toysample01.ipynb](https://colab.research.google.com/drive/10GUSXxDzE68AwbYLPDUyDPnAmasQydTG?usp=sharing)
+
 ## Abstract 
 在Teaching sample的branch中，我利用台灣人工智慧學校的Gitlab(`aia_federated_test`)作為梯度/模型的中轉站，並將執行程序分成`server`、`client`兩個路徑分別對Gitlab進行存取。
 - 在server資料夾內，你可以將來自不同branch的模型權重聚合，並更新`global_model.pbz2`並設定`training.cfg`用來控制client的工作狀態與網路拓樸。
