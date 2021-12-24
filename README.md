@@ -2,7 +2,8 @@
 聯邦學習工具包
 
 ## Colab code
-- Git based local client toy example [AIA_FL_toysample01.ipynb](https://colab.research.google.com/drive/10GUSXxDzE68AwbYLPDUyDPnAmasQydTG?usp=sharing)
+- Git based local client toy example 
+  - [AIA_FL_toysample01.ipynb](https://colab.research.google.com/drive/10GUSXxDzE68AwbYLPDUyDPnAmasQydTG?usp=sharing)
 
 ## Abstract 
 在Teaching sample的branch中，我利用台灣人工智慧學校的Gitlab(`aia_federated_test`)作為梯度/模型的中轉站，並將執行程序分成`server`、`client`兩個路徑分別對Gitlab進行存取。
