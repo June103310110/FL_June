@@ -24,6 +24,8 @@ else:
     cmd_lis = '''git clone https://{account}@{gitURL}
     cd federated_aia_test
     git pull
+    git config --global user.email "at102091@aiacademy.tw"
+    git config --global user.name "at102test"
     '''.format(account=account, gitURL=gitURL.split('//')[-1])
 
 run_cmd(cmd_lis)
