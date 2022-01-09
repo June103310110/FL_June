@@ -295,7 +295,7 @@ else:
     for i in zip(*weights):
         new_weights.append(tf.reduce_sum(i, axis=0))
         
-global_model.set_weights(model_attri['weights'])
+global_model.set_weights(new_weights)
 
 
 # In[20]:
