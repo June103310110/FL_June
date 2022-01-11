@@ -1,6 +1,6 @@
 import os
 
-with open('account.cfg', 'r') as f:
+with open('../../FL_June/account.cfg', 'r') as f:
     r = f.read()
     
     dic = {}
