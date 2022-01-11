@@ -7,7 +7,7 @@
 #@param {type:"boolean"}
 
 
-# In[1]:
+# In[2]:
 
 
 # gitURL = 'https://gitlab.aiacademy.tw/junew/federated_aia_test.git'
@@ -27,7 +27,7 @@ account = dic['account']
 repo_name = 'june-federated-server'
 
 
-# In[2]:
+# In[3]:
 
 
 import os
@@ -39,7 +39,7 @@ else:
     print(os.getcwd())
 
 
-# In[3]:
+# In[5]:
 
 
 from tensorflow.keras.models import Sequential, Model
@@ -50,9 +50,7 @@ import tensorflow as tf
 import numpy as np
 from datetime import date
 import sys
-
-
-sys.path.append(f'/content/{repo_name}/')
+sys.path.append(f'./{repo_name}/')
 from utils import compressed_cpickle, decompress_cpickle
 
 
@@ -64,7 +62,7 @@ from utils import compressed_cpickle, decompress_cpickle
 
 # ### control_key (optional)
 
-# In[4]:
+# In[6]:
 
 
 contro_key = {}
@@ -74,7 +72,7 @@ contro_key['new_model'] = False # default to False
 # ## 移動到federated_aia_test floder
 # 如果不存在，請先執行最上面的git clone
 
-# In[5]:
+# In[7]:
 
 
 print(os.getcwd())
@@ -88,7 +86,7 @@ else:
 # ## 建立新的初始化global model 
 # > 只有當模型不存在、或者你更新了架構、打算重新訓練的時候
 
-# In[6]:
+# In[8]:
 
 
 def simplecnn():
@@ -119,7 +117,7 @@ def simplecnn():
     return cnn_model
 
 
-# In[7]:
+# In[9]:
 
 
 from datetime import date
@@ -135,7 +133,7 @@ lis = [i for i in lis if i.__contains__('global_model')]
 print(lis)
 
 
-# In[8]:
+# In[10]:
 
 
 if contro_key['new_model'] == True:
@@ -177,7 +175,7 @@ if contro_key['new_model'] == True:
 
 # ## 下載各個branch中的模型壓縮檔
 
-# In[9]:
+# In[11]:
 
 
 r = os.popen('git pull').read()
@@ -196,7 +194,7 @@ if len(all_client_branch) <= 0:
     raise ValueError('June: No clients appear')
 
 
-# In[10]:
+# In[12]:
 
 
 run_cmd = lambda cmd_lis:[os.popen(i).read() for i in cmd_lis.split('\n')]
@@ -216,7 +214,7 @@ for i in all_client_branch:
 
 # ## 聚合並更新global model
 
-# In[12]:
+# In[13]:
 
 
 model_attri = decompress_cpickle('./global_model.pbz2')
@@ -227,7 +225,7 @@ lis.remove('global_model.pbz2')
 print(lis)
 
 
-# In[13]:
+# In[14]:
 
 
 weights = []
@@ -237,7 +235,7 @@ for i in lis:
 print(np.shape(weights))
 
 
-# In[14]:
+# In[15]:
 
 
 new_weights = list()
@@ -251,10 +249,10 @@ else:
     for i in zip(*weights):
         new_weights.append(tf.reduce_sum(i, axis=0))
         
-global_model.set_weights(model_attri['weights'])
+global_model.set_weights(new_weights)
 
 
-# In[15]:
+# In[16]:
 
 
 model_attri = {'weights':global_model.get_weights(), 'json':global_model.to_json()}
@@ -262,7 +260,7 @@ model_attri = {'weights':global_model.get_weights(), 'json':global_model.to_json
 compressed_cpickle('./global_model', model_attri)
 
 
-# In[16]:
+# In[17]:
 
 
 import os
