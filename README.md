@@ -7,7 +7,7 @@
 ## Colab code
 - Git based local client toy example 
   - [AIA_FL_toysample01.ipynb](https://colab.research.google.com/drive/10GUSXxDzE68AwbYLPDUyDPnAmasQydTG?usp=sharing)
-
+  - [AIA_FL_server.ipynb](https://colab.research.google.com/drive/1FW57Yr3PBGGbCqByXgoIiAlLQ0thSUW_#scrollTo=Q8v32AhpPXCu)
 ---
 
 ### Tensorflow聯邦學習入門簡介
