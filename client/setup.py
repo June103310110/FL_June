@@ -11,7 +11,7 @@ with open('account.cfg', 'r') as f:
     print(dic)
 gitURL = dic['gitURL']
 account = dic['account']
-repo_name = 'Federated_server_June'
+repo_name = 'june-federated-server'
         
 run_cmd = lambda cmd_lis:[os.popen(i).read() for i in cmd_lis.split('\n')]
 
