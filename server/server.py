@@ -48,9 +48,11 @@ from tensorflow.keras.layers import (Input, Dense, Dropout, Activation,
                                      Conv2D, MaxPooling2D)
 import tensorflow as tf
 import numpy as np
-import sys
 from datetime import date
-sys.path.append('june-federated-server')
+import sys
+
+
+sys.path.append(f'/content/{repo_name}/')
 from utils import compressed_cpickle, decompress_cpickle
 
 
