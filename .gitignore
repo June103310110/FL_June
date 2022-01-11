@@ -1,6 +1,6 @@
 .ipynb_checkpoints
 *.pbz2
-federated_aia_test
+june-federated-server
 __pycache__
 model-logs
 saved_model
