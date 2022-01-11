@@ -97,9 +97,13 @@ if '.gitignore' not in os.listdir():
         f.writelines('__pycache__\n')
         f.writelines('.ipynb_checkpoints\n')
         f.writelines('local.cfg\n')
+        f.writelines('global_model.pbz2\n')
         for i in os.listdir('../tmp'):
             print(i)
-            f.writelines(i+'\n')
+            if i.__contains__('.pbz'):
+                pass
+            else:
+                f.writelines(i+'\n')
 
             
             
