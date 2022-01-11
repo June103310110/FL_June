@@ -11,25 +11,28 @@ with open('account.cfg', 'r') as f:
     print(dic)
 gitURL = dic['gitURL']
 account = dic['account']
-
+repo_name = 'Federated_server_June'
         
 run_cmd = lambda cmd_lis:[os.popen(i).read() for i in cmd_lis.split('\n')]
 
-if 'federated_aia_test' in os.listdir():
-    cmd_lis = '''cd federated_aia_test
+if repo_name in os.listdir():
+    cmd_lis = '''cd {repo_name}
     git pull
-    '''
+    '''.format(repo_name=repo_name)
 else: 
-    print('update federated_aia_test')
+    print('update Federated_server_June')
     cmd_lis = '''git clone https://{account}@{gitURL}
-    cd federated_aia_test
+    cd {repo_name}
     git pull
-    git config --global user.email "at102091@aiacademy.tw"
-    git config --global user.name "at102test"
-    '''.format(account=account, gitURL=gitURL.split('//')[-1])
+    git config --global user.email "{gitname}"
+    git config --global user.name "gitFederated"
+    '''.format(account=account,
+               gitURL=gitURL.split('//')[-1],
+               repo_name = repo_name,
+               gitname = 'AIA-federated-0121')
 
 run_cmd(cmd_lis)
-os.chdir('federated_aia_test')
+os.chdir(repo_name)
 print(os.listdir())
 
 # learning.cfg
