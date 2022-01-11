@@ -185,7 +185,7 @@ os.popen('git remote update origin --prune')
 lis = os.popen('git branch -r').read().split('\n')[:-1]
 
 
-all_client_branch = [i for i in  lis if not i.__contains__('master')]
+all_client_branch = [i for i in  lis if not i.__contains__('main')]
 
 print(all_client_branch)
 
