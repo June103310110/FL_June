@@ -1,6 +1,13 @@
 import os
-
-with open('../../FL_June/account.cfg', 'r') as f:
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-p2a", "--path2account", help="path to account.cfg", required=False, default=None)
+args = parser.parse_args()
+if args.path2account:
+    path2account = args.path2account
+else:
+    path2account = '../../FL_June/account.cfg'
+with open(path2account, 'r') as f:
     r = f.read()
     
     dic = {}
