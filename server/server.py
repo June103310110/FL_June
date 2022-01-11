@@ -212,12 +212,6 @@ for i in all_client_branch:
     print(result)
 
 
-# In[11]:
-
-
-get_ipython().system('git branch -a')
-
-
 # ## 聚合並更新global model
 
 # In[12]:
