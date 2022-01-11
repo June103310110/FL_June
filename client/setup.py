@@ -6,7 +6,7 @@ args = parser.parse_args()
 if args.path2account:
     path2account = args.path2account
 else:
-    path2account = '../../FL_June/account.cfg'
+    path2account = './account.cfg'
 with open(path2account, 'r') as f:
     r = f.read()
     
