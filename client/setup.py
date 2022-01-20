@@ -23,7 +23,7 @@ repo_name = 'june-federated-server'
 run_cmd = lambda cmd_lis:[os.popen(i).read() for i in cmd_lis.split('\n')]
 
 if repo_name in os.listdir():
-    print(f'***\n\nupdate repo_name\n\n***')
+    print('***\n\nupdate global mdoel from main branch\n\n***')
     cmd_lis = '''cd {repo_name}
     git pull
     '''.format(repo_name=repo_name)
