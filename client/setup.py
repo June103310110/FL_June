@@ -27,7 +27,7 @@ if repo_name in os.listdir():
     git pull
     '''.format(repo_name=repo_name)
 else: 
-    print('update Federated_server_June')
+    print('\n\n***update Federated_server_June\n***\n\n')
     cmd_lis = '''git clone https://{account}@{gitURL}
     cd {repo_name}
     git pull
